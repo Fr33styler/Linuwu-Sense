@@ -22,7 +22,7 @@ openssl req -new -x509 -newkey rsa:2048 -keyout MOK.key -out MOK.crt -nodes -day
 openssl x509 -in MOK.crt -outform DER -out MOK.der
 sudo mokutil --import MOK.der 
 ```
-Restart and then:
+Set a password for the key, restart and then:
 
 ```bash
 make install
