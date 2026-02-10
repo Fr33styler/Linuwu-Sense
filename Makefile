@@ -4,12 +4,21 @@ KVER  ?= $(shell uname -r)
 KDIR  := /lib/modules/$(KVER)/build
 PWD   := $(shell pwd)
 
+SIGN_KEY ?= MOK.key
+SIGN_CERT ?= MOK.crt
+
 MDIR  := /lib/modules/$(KVER)/kernel/drivers/platform/x86
 MODNAME := linuwu_sense
 REAL_USER := $(shell echo $${SUDO_USER:-$$(whoami)})
 
 all:
 	$(MAKE) -C $(KDIR) M=$(PWD) modules
+
+sign: all
+	@echo "Signing $(MODNAME).ko for Secure Boot..."
+	sudo /usr/src/linux-headers-$(KVER)/scripts/sign-file \
+		sha256 $(SIGN_KEY) $(SIGN_CERT) src/$(MODNAME).ko
+	@echo "Module signed successfully."
 
 clean:
 	$(MAKE) -C $(KDIR) M=$(PWD) clean
@@ -36,6 +45,7 @@ uninstall:
 	@echo "Uninstalled $(MODNAME) and cleaned up related configuration."
 
 install: all
+	$(MAKE) sign
 	@sudo rmmod acer_wmi 2>/dev/null || true
 	@echo "blacklist acer_wmi" | sudo tee /etc/modprobe.d/blacklist-acer_wmi.conf > /dev/null
 	sudo install -d $(MDIR)

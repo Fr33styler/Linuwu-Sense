@@ -16,8 +16,15 @@ sudo pacman -S linux-headers
 ```
 Next, clone the repository and build the module:
 ```bash
-git clone https://github.com/0x7375646F/Linuwu-Sense.git
+git clone https://github.com/Fr33styler/Linuwu-Sense.git
 cd Linuwu-Sense
+openssl req -new -x509 -newkey rsa:2048 -keyout MOK.key -out MOK.crt -nodes -days 36500 -subj "/CN=linuwu_sense/"
+openssl x509 -in MOK.crt -outform DER -out MOK.der
+sudo mokutil --import MOK.der 
+```
+Restart and then:
+
+```bash
 make install
 ```
 The make command will remove the current acer_wmi module and load the patched version.
